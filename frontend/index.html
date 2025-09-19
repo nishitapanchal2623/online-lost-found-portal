@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost and Found Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            color: #4361ee;
+            font-size: 28px;
+            margin-left: 10px;
+        }
+        
+        .logo i {
+            font-size: 32px;
+            color: #4361ee;
+        }
+        
+        .auth-container {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .auth-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .login-btn {
+            background: transparent;
+            border: 2px solid #4361ee;
+            color: #4361ee;
+        }
+        
+        .login-btn:hover {
+            background: #4361ee;
+            color: white;
+        }
+        
+        .signup-btn {
+            background: #4361ee;
+            border: 2px solid #4361ee;
+            color: white;
+        }
+        
+        .signup-btn:hover {
+            background: #3a56d4;
+        }
+        
+        .profile-container {
+            display: none;
+            position: relative;
+        }
+        
+        .profile-picture {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #4361ee;
+            cursor: pointer;
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            overflow: hidden;
+            z-index: 100;
+        }
+        
+        .dropdown-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .dropdown-item i {
+            margin-right: 10px;
+            color: #4361ee;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .hero h2 {
+            font-size: 42px;
+            color: #4361ee;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: #6c757d;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-btn {
+            padding: 15px 30px;
+            background: #4361ee;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .cta-btn:hover {
+            background: #3a56d4;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: #4361ee;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+        
+        .feature-card p {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            background: #4361ee;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: #4361ee;
+            outline: none;
+        }
+        
+        .modal-footer {
+            padding: 20px 30px 30px;
+            text-align: center;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #4361ee;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: #3a56d4;
+        }
+        
+        .switch-form {
+            margin-top: 20px;
+            color: #6c757d;
+        }
+        
+        .switch-form a {
+            color: #4361ee;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .dashboard {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-header h2 {
+            color: #4361ee;
+        }
+        
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .dashboard-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .dashboard-card h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .dashboard-card h3 i {
+            margin-right: 10px;
+            color: #4361ee;
+        }
+        
+        .upload-profile {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .upload-profile h3 {
+            color: #4361ee;
+            margin-bottom: 20px;
+        }
+        
+        .upload-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #4361ee;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background: #3a56d4;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-bottom: 15px;
+            }
+            
+            .auth-container {
+                margin-top: 15px;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-search-location"></i>
+                <h1>Lost and Found Portal</h1>
+            </div>
+            
+            <div class="auth-container" id="authContainer">
+                <div class="auth-btn login-btn" id="loginBtn">Login</div>
+                <div class="auth-btn signup-btn" id="signupBtn">Sign Up</div>
+            </div>
+            
+            <div class="profile-container" id="profileContainer">
+                <img src="https://via.placeholder.com/50" alt="Profile" class="profile-picture" id="profilePicture">
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <div class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </div>
+                    <div class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </div>
+                    <div class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="hero">
+            <h2>Find What You've Lost, Return What You've Found</h2>
+            <p>Our platform helps reunite lost items with their owners quickly and efficiently. Join our community today!</p>
+            <button class="cta-btn" id="heroCtaBtn">Get Started</button>
+        </div>
+        
+        <div class="upload-profile" id="uploadProfile">
+            <h3><i class="fas fa-user-plus"></i> Complete Your Profile</h3>
+            <p>Please upload a profile picture to continue using the Lost and Found Portal</p>
+            <input type="file" id="profileUpload" accept="image/*" style="display: none;">
+            <div class="upload-btn" id="uploadTrigger">Upload Profile Picture</div>
+        </div>
+        
+        <div class="dashboard" id="dashboard">
+            <div class="dashboard-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <div class="user-welcome">Welcome, <span id="userName">User</span>!</div>
+            </div>
+            
+            <div class="dashboard-content">
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-search"></i> Report Lost Item</h3>
+                    <p>Can't find something? Report it here and we'll help you find it.</p>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-hand-holding-heart"></i> Report Found Item</h3>
+                    <p>Found something that doesn't belong to you? Report it here.</p>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-list"></i> My Reports</h3>
+                    <p>View all your lost and found item reports in one place.</p>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-bell"></i> Notifications</h3>
+                    <p>Get alerts when your lost items are found or claimed.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h3>Easy Reporting</h3>
+                <p>Quickly report lost or found items with our simple form and process.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3>Location Tracking</h3>
+                <p>Pinpoint exact locations where items were lost or found on our interactive map.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure Platform</h3>
+                <p>Your data is protected with advanced security measures and encryption.</p>
+            </div>
+        </div>
+        
+        <div class="modal" id="loginModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Login to Your Account</h2>
+                    <div class="close-modal">&times;</div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="submit-btn" id="loginSubmit">Login</button>
+                    <div class="switch-form">
+                        Don't have an account? <a id="switchToSignup">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal" id="signupModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Create New Account</h2>
+                    <div class="close-modal">&times;</div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupConfirmPassword">Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="submit-btn" id="signupSubmit">Create Account</button>
+                    <div class="switch-form">
+                        Already have an account? <a id="switchToLogin">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2023 Lost and Found Portal. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const heroCtaBtn = document.getElementById('heroCtaBtn');
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        const switchToSignup = document.getElementById('switchToSignup');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const loginSubmit = document.getElementById('loginSubmit');
+        const signupSubmit = document.getElementById('signupSubmit');
+        const authContainer = document.getElementById('authContainer');
+        const profileContainer = document.getElementById('profileContainer');
+        const profilePicture = document.getElementById('profilePicture');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const uploadProfile = document.getElementById('uploadProfile');
+        const dashboard = document.getElementById('dashboard');
+        const uploadTrigger = document.getElementById('uploadTrigger');
+        const profileUpload = document.getElementById('profileUpload');
+        const userName = document.getElementById('userName');
+
+        // Check if user is logged in
+        function checkLoginStatus() {
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (user) {
+                authContainer.style.display = 'none';
+                profileContainer.style.display = 'block';
+                userName.textContent = user.name;
+                
+                if (user.profilePicture) {
+                    profilePicture.src = `http://localhost:3000/${user.profilePicture}`;
+                    uploadProfile.style.display = 'none';
+                    dashboard.style.display = 'block';
+                } else {
+                    profilePicture.src = 'https://via.placeholder.com/50';
+                    uploadProfile.style.display = 'block';
+                    dashboard.style.display = 'none';
+                }
+            } else {
+                authContainer.style.display = 'flex';
+                profileContainer.style.display = 'none';
+                uploadProfile.style.display = 'none';
+                dashboard.style.display = 'none';
+            }
+        }
+
+        // Show modal function
+        function showModal(modal) {
+            modal.style.display = 'flex';
+        }
+
+        // Hide modal function
+        function hideModal(modal) {
+            modal.style.display = 'none';
+        }
+
+        // Event Listeners
+        loginBtn.addEventListener('click', () => showModal(loginModal));
+        signupBtn.addEventListener('click', () => showModal(signupModal));
+        heroCtaBtn.addEventListener('click', () => showModal(signupModal));
+
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                hideModal(loginModal);
+                hideModal(signupModal);
+            });
+        });
+
+        switchToSignup.addEventListener('click', () => {
+            hideModal(loginModal);
+            showModal(signupModal);
+        });
+
+        switchToLogin.addEventListener('click', () => {
+            hideModal(signupModal);
+            showModal(loginModal);
+        });
+
+        // Profile picture dropdown
+        profilePicture.addEventListener('click', () => {
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!profileContainer.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
+
+        // Upload profile picture
+        uploadTrigger.addEventListener('click', () => {
+            profileUpload.click();
+        });
+
+        // Login form submission
+        loginSubmit.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('loggedInUser', JSON.stringify(data.user));
+                    checkLoginStatus();
+                    hideModal(loginModal);
+                    
+                    // Clear form
+                    document.getElementById('loginEmail').value = '';
+                    document.getElementById('loginPassword').value = '';
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed. Please make sure the backend server is running.');
+            }
+        });
+
+        // Signup form submission
+        signupSubmit.addEventListener('click', async () => {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            
+            if (!name || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // After signup, automatically log the user in
+                    const loginResponse = await fetch('http://localhost:3000/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const loginData = await loginResponse.json();
+                    
+                    if (loginResponse.ok) {
+                        localStorage.setItem('loggedInUser', JSON.stringify(loginData.user));
+                        checkLoginStatus();
+                        hideModal(signupModal);
+                        
+                        // Clear form
+                        document.getElementById('signupName').value = '';
+                        document.getElementById('signupEmail').value = '';
+                        document.getElementById('signupPassword').value = '';
+                        document.getElementById('signupConfirmPassword').value = '';
+                        
+                        alert('Account created successfully! Please upload a profile picture.');
+                    } else {
+                        alert('Account created but login failed. Please try logging in.');
+                    }
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('Signup failed. Please make sure the backend server is running.');
+            }
+        });
+
+        profileUpload.addEventListener('change', async (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const user = JSON.parse(localStorage.getItem('loggedInUser'));
+                const formData = new FormData();
+                formData.append('profilePicture', e.target.files[0]);
+                formData.append('userId', user.id);
+                
+                try {
+                    const response = await fetch('http://localhost:3000/api/upload-profile', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Update user profile picture in local storage
+                        user.profilePicture = data.profilePicture;
+                        localStorage.setItem('loggedInUser', JSON.stringify(user));
+                        
+                        // Update UI
+                        profilePicture.src = `http://localhost:3000/${data.profilePicture}`;
+                        uploadProfile.style.display = 'none';
+                        dashboard.style.display = 'block';
+                    } else {
+                        alert(data.error);
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert('Failed to upload profile picture. Please try again.');
+                }
+            }
+        });
+
+        // Initialize the application
+        checkLoginStatus();
+    </script>
+</body>
+</html>
