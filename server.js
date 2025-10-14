@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
+const fs = require('fs');
 
 const app = express();
 const PORT = 3000;
@@ -15,13 +16,20 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ✅ UPLOADS FOLDER CREATE IF NOT EXISTS
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('Uploads folder created successfully');
+}
+app.use('/uploads', express.static(uploadsDir));
 
 // Database connection - PASSWORD CHANGE KARNA
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'Meet1234@', // YAHAN APNA MYSQL PASSWORD DALNA
+  password: 'Meet1234@',
   database: 'lost_and_found'
 });
 
@@ -48,7 +56,7 @@ const storage = multer.diskStorage({
 const upload = multer({ 
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 5 * 1024 * 1024
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -59,14 +67,15 @@ const upload = multer({
   }
 });
 
-// Signup endpoint
+// Signup endpoint - PHONE NUMBER ADD KIYA
 app.post('/api/signup', async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, phone, password } = req.body;
   
   try {
     // Check if user already exists
-    db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+    db.query('SELECT * FROM lostandfound WHERE email = ?', [email], async (err, results) => {
       if (err) {
+        console.log('Database Error in signup:', err);
         return res.status(500).json({ error: 'Database error' });
       }
       
@@ -78,12 +87,13 @@ app.post('/api/signup', async (req, res) => {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
       
-      // Insert user into database
+      // Insert user into database with PHONE NUMBER
       db.query(
-        'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-        [name, email, hashedPassword],
+        'INSERT INTO lostandfound (name, email, phone, password) VALUES (?, ?, ?, ?)',
+        [name, email, phone, hashedPassword],
         (err, results) => {
           if (err) {
+            console.log('Database Insert Error:', err);
             return res.status(500).json({ error: 'Failed to create user' });
           }
           
@@ -95,6 +105,7 @@ app.post('/api/signup', async (req, res) => {
       );
     });
   } catch (error) {
+    console.log('Signup Error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -104,8 +115,9 @@ app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
   
   // Find user by email
-  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+  db.query('SELECT * FROM lostandfound WHERE email = ?', [email], async (err, results) => {
     if (err) {
+      console.log('Database Error in login:', err);
       return res.status(500).json({ error: 'Database error' });
     }
     
@@ -127,6 +139,7 @@ app.post('/api/login', (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
       profilePicture: user.profile_picture
     };
     
@@ -147,12 +160,15 @@ app.post('/api/upload-profile', upload.single('profilePicture'), (req, res) => {
   
   const profilePicturePath = `uploads/${req.file.filename}`;
   
+  console.log('File uploaded successfully:', req.file);
+  
   // Update user profile picture in database
   db.query(
-    'UPDATE users SET profile_picture = ? WHERE id = ?',
+    'UPDATE lostandfound SET profile_picture = ? WHERE id = ?',
     [profilePicturePath, userId],
     (err, results) => {
       if (err) {
+        console.log('Database Update Error:', err);
         return res.status(500).json({ error: 'Failed to update profile picture' });
       }
       
@@ -168,8 +184,9 @@ app.post('/api/upload-profile', upload.single('profilePicture'), (req, res) => {
 app.get('/api/user/:id', (req, res) => {
   const userId = req.params.id;
   
-  db.query('SELECT id, name, email, profile_picture FROM users WHERE id = ?', [userId], (err, results) => {
+  db.query('SELECT id, name, email, phone, profile_picture FROM lostandfound WHERE id = ?', [userId], (err, results) => {
     if (err) {
+      console.log('Database Error in get user:', err);
       return res.status(500).json({ error: 'Database error' });
     }
     
